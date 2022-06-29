@@ -2,21 +2,18 @@
 title: MergeSort
 date: 2022-06-29 18:00:00
 categories:
-tags: 
 - [C++, Algorithm]
 tags:
 - array
 ---
 
 ``` C++
-#pragma once
-
+#include <cassert>
+#include <iostream>
 #include <vector>
 
-using i64 = long long;
-
-template <typename T>
-T MergeSortDo(int left, int right, std::vector<T> &a, std::vector<T> &b) {
+template <typename T, typename U>
+T MergeSortDo(int left, int right, std::vector<U> &a, std::vector<U> &b) {
     int mid = (left + right) / 2;
     int i = left, j = mid + 1, k = left;
     T res = 0;
@@ -25,7 +22,7 @@ T MergeSortDo(int left, int right, std::vector<T> &a, std::vector<T> &b) {
             b[k] = a[i];
             i++, k++;
         } else {
-            res += (j - k);
+            res = (res + (j - k)) % mod;
             b[k] = a[j];
             j++, k++;
         }
@@ -44,22 +41,22 @@ T MergeSortDo(int left, int right, std::vector<T> &a, std::vector<T> &b) {
     return res;
 }
 
-template <typename T>
-T MergeSortDFS(int left, int right, std::vector<T> &a, std::vector<T> &b) {
+template <typename T, typename U>
+T MergeSortDFS(int left, int right, std::vector<U> &a, std::vector<U> &b) {
     T res = 0;
     if (left < right) {
         int mid = (left + right) / 2;
-        res += MergeSortDFS<T>(left, mid, a, b);
-        res += MergeSortDFS<T>(mid + 1, right, a, b);
-        res += MergeSortDo<T>(left, right, a, b);
+        res = (res + MergeSortDFS<T, U>(left, mid, a, b)) % mod;
+        res = (res + MergeSortDFS<T, U>(mid + 1, right, a, b)) % mod;
+        res = (res + MergeSortDo<T, U>(left, right, a, b)) % mod;
     }
     return res;
 }
 
-template <typename T>
-T MergeSort(std::vector<T> &a) {
-    std::vector<T> b(a);
-    return MergeSortDFS<T>(0, a.size() - 1, a, b);
+template <typename T, typename U>
+T MergeSort(std::vector<U> &a) {
+    std::vector<U> b(a);
+    return MergeSortDFS<T, U>(0, a.size() - 1, a, b);
 }
 
 ```
