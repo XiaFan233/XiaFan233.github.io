@@ -5,6 +5,7 @@ categories:
 - [C++, Algorithm]
 tags:
 - matrix
+- array
 ---
 
 ``` C++

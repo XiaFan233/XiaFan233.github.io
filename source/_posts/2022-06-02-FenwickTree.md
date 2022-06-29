@@ -5,6 +5,7 @@ categories:
 - [C++, Algorithm]
 tags:
 - tree
+- array
 ---
 
 ``` C++
@@ -23,7 +24,8 @@ private:
 
     T sum(int pos) {
         T val = 0;
-        for (int i = pos + 1; i > 0; i -= lowbit(i)) {
+        pos++;
+        for (int i = pos; i > 0; i -= lowbit(i)) {
             val += a[i - 1];
         }
         return val;
@@ -39,7 +41,8 @@ public:
     }
 
     void add(int pos, T val) {
-        for (int i = pos + 1; i <= n; i += lowbit(i)) {
+        pos++;
+        for (int i = pos; i <= n; i += lowbit(i)) {
             a[i - 1] += val;
         }
     }
@@ -49,8 +52,9 @@ public:
         if (left == 0) {
             return sum(right);
         } else {
-            return sum(right) - sum(left);
+            return sum(right) - sum(left - 1);
         }
     }
 };
+
 ```

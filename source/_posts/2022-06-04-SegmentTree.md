@@ -5,6 +5,7 @@ categories:
 - [C++, Algorithm]
 tags:
 - tree
+- array
 ---
 
 ``` C++
@@ -15,13 +16,19 @@ tags:
 template <typename T> class SegmentTree {
 private:
     struct node {
-        T val;
+        int l, r;
+        T sum;
         T tag;
-        int cnt;  // numbers can be modify
-        node() : val(0), tag(0), cnt(0) {}
+        // int cnt = 0;
+        node() : sum(0), tag(0) {}
+        int mid() {
+            return (l + r) / 2;
+        }
     };
+
     int n;
     std::vector<node> tree;
+
     int ls(int root) {
         return root * 2 + 1;
     }
@@ -30,99 +37,114 @@ private:
     }
 
     void push_up(int root) {
-        tree[root].val = tree[ls(root)].val + tree[rs(root)].val;
+        // assert(root < 4 * n);
+        tree[root].sum = tree[ls(root)].sum + tree[rs(root)].sum;
+        // tree[root].sum = std::max(tree[ls(root)].sum, tree[rs(root)].sum);
         // tree[root].cnt = tree[m_l(root)].cnt + tree[m_r(root)].cnt;
     }
 
-    void build(int root, int left, int right, const std::vector<T> &num) {
-        assert(root < 4 * n);
-        if (left == right) {
-            tree[root].val = num[left];
+    void build(int root, const std::vector<T> &num) {
+        // assert(root < 4 * n);
+        if (tree[root].l == tree[root].r) {
+            tree[root].sum = num[tree[root].l];
             // tree[root].cnt = 1;
             return;
         }
-        int mid = (left + right) / 2;
-        build(ls(root), left, mid, num);
-        build(rs(root), mid + 1, right, num);
+        int mid = tree[root].mid();
+
+        tree[ls(root)].l = tree[root].l;
+        tree[ls(root)].r = mid;
+        tree[rs(root)].l = mid + 1;
+        tree[rs(root)].r = tree[root].r;
+
+        build(ls(root), num);
+        build(rs(root), num);
         push_up(root);
     }
 
-    void change(int root, int left, int right, T val) {
+    void change(int root, T val) {
+        // assert(root < 4 * n);
         tree[root].tag += val;
-        tree[root].val += (val * (right - left + 1));
-        // tree[root].val += (val * tree[root].cnt);
+        tree[root].sum += (val * (tree[root].r - tree[root].l + 1));
+        // tree[root].sum = val;
+        // tree[root].sum += (val * tree[root].cnt);
     }
 
-    void push_down(int root, int left, int right) {
-        int mid = (left + right) / 2;
-        change(ls(root), left, mid, tree[root].tag);
-        change(rs(root), mid + 1, right, tree[root].tag);
+    void push_down(int root) {
+        // assert(root < 4 * n);
+        change(ls(root), tree[root].tag);
+        change(rs(root), tree[root].tag);
         tree[root].tag = 0;
     }
 
-    void update(int root, int left, int right, int l, int r, int val) {
-        assert(root < 4 * n);
-        if (l <= left && right <= r) {
-            change(root, left, right, val);
+    void update(int root, int left, int right, int val) {
+        // assert(root < 4 * n);
+        if (left <= tree[root].l && tree[root].r <= right) {
+            change(root, val);
             return;
         }
-        push_down(root, left, right);
-        int mid = (left + right) / 2;
-        if (l <= mid) update(ls(root), left, mid, l, r, val);
-        if (mid + 1 <= r) update(rs(root), mid + 1, right, l, r, val);
+        push_down(root);
+        int mid = tree[root].mid();
+        if (left <= mid) update(ls(root), left, right, val);
+        if (mid + 1 <= right) update(rs(root), left, right, val);
         push_up(root);
     }
-
-    void cnt_update(int root, int left, int right, int pos, int val) {
+    /*
+    void cnt_update(int root, int pos, int val) {
         assert(root < 4 * n);
         tree[root].cnt += val;
-        if (left == right) {
+        if (tree[root].l == tree[root].r) {
             return;
         }
-        push_down(root, left, right);
-        int mid = (left + right) / 2;
+        push_down(root);
+        int mid = tree[root].mid();
         if (pos <= mid) {
-            cnt_update(ls(root), left, mid, pos, val);
+            cnt_update(ls(root), pos, val);
         } else {
-            cnt_update(rs(root), mid + 1, right, pos, val);
+            cnt_update(rs(root), pos, val);
         }
         push_up(root);
     }
-
-    T query(int root, int left, int right, int l, int r) {
-        assert(root < 4 * n);
-        if (l <= left && right <= r) {
-            return tree[root].val;
+    */
+    T query(int root, int left, int right) {
+        // assert(root < 4 * n);
+        if (left <= tree[root].l && tree[root].r <= right) {
+            return tree[root].sum;
         }
         T ans = 0;
-        push_down(root, left, right);
-        int mid = (left + right) / 2;
-        if (l <= mid) {
-            ans += query(ls(root), left, mid, l, r);
+        push_down(root);
+        int mid = tree[root].mid();
+        if (left <= mid) {
+            ans += query(ls(root), left, right);
+            // ans = max(ans, query(ls(root), left, right));
         }
-        if (mid + 1 <= r) {
-            ans += query(rs(root), mid + 1, right, l, r);
+        if (mid + 1 <= right) {
+            ans += query(rs(root), left, right);
+            // ans = max(ans, query(rs(root), left, right));
         }
         return ans;
     }
 
 public:
-    SegmentTree(cosnt std::vector<T> &num) : n(num.size()), tree(num.size() * 4) {
-        build(0, 0, n - 1, num);
+    SegmentTree(const std::vector<T> &num) : n(num.size()), tree(num.size() * 4) {
+        tree[0].l = 0;
+        tree[0].r = n - 1;
+        build(0, num);
     }
 
     void update(int left, int right, int val) {
-        update(0, 0, n - 1, left, right, val);
+        update(0, left, right, val);
     }
 
     T query(int left, int right) {
-        return query(0, 0, n - 1, left, right);
+        return query(0, left, right);
     }
-
+    /*
     void cnt_update(int pos, int val) {
         assert(val == -1 || val == 1);
-        push_down(0, 0, n - 1);
-        cnt_update(0, 0, n - 1, pos, val);
+        push_down(0);
+        cnt_update(0, pos, val);
     }
+    */
 };
 ```
