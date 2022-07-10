@@ -4,8 +4,9 @@ date: 2022-06-02 18:00:00
 categories:
 - [C++, Algorithm]
 tags:
-- tree
-- array
+- Tree
+- Array
+- Fast
 ---
 
 ``` C++

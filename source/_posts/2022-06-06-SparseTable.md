@@ -4,8 +4,9 @@ date: 2022-06-06 18:00:00
 categories:
 - [C++, Algorithm]
 tags:
-- matrix
-- array
+- Matrix
+- Array
+- Fast
 ---
 
 ``` C++

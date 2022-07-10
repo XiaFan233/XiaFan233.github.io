@@ -2,9 +2,9 @@
 title: Python Test
 date: 2022-06-08 18:00:00
 categories: 
-- [Python, test]
+- [Python, Test]
 tags: 
-- test
+- Test
 ---
 
 # Pytorch

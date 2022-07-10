@@ -1,16 +1,19 @@
 ---
-title: MergeSort
+title: Merge Sort
 date: 2022-06-29 18:00:00
 categories:
 - [C++, Algorithm]
 tags:
-- array
+- Array
+- Sort
 ---
 
 ``` C++
 #include <cassert>
 #include <iostream>
 #include <vector>
+
+constexpr int mod = 1e9;
 
 template <typename T, typename U>
 T MergeSortDo(int left, int right, std::vector<U> &a, std::vector<U> &b) {
